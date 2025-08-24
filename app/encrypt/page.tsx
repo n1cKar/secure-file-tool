@@ -3,13 +3,14 @@
 import { useState } from "react";
 import FileDrop from "@/components/FileDrop";
 import PasswordStrength from "@/components/PasswordStrength";
-import { encryptFile } from "@/lib/crypto";
+import { encryptFile, Algorithm } from "@/lib/crypto";
 import { downloadBlob } from "@/utils/file";
 import Link from "next/link";
 
 export default function EncryptPage() {
   const [file, setFile] = useState<File | null>(null);
   const [password, setPassword] = useState("");
+  const [algorithm, setAlgorithm] = useState<Algorithm>("AES-GCM");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,13 +19,10 @@ export default function EncryptPage() {
     setBusy(true);
     setError(null);
     try {
-      const { blob, suggestedName } = await encryptFile(file, password);
+      const { blob, suggestedName } = await encryptFile(file, password, algorithm);
       downloadBlob(blob, suggestedName);
-    } catch (error: unknown) {
-      // Safe type narrowing
-      let msg = "Encryption failed";
-      if (error instanceof Error) msg = error.message;
-      setError(msg);
+    } catch (e: unknown) {
+      setError((e as Error)?.message || "Encryption failed");
     } finally {
       setBusy(false);
     }
@@ -32,7 +30,6 @@ export default function EncryptPage() {
 
   return (
     <div className="grid gap-6">
-      {/* Home Button */}
       <div className="mt-6">
         <Link
           href="/"
@@ -40,13 +37,8 @@ export default function EncryptPage() {
         >
           🏠 Home
         </Link>
-
-        {/* Page Description */}
         <p className="mt-3 text-gray-600 dark:text-gray-400 text-sm max-w-xl">
-          Use this page to securely encrypt your files before sharing or storing them. 
-          Upload any file type, enter a strong passphrase, and download the encrypted{" "}
-          <code>.enc</code> file. All encryption happens in your browser using AES-GCM 
-          with PBKDF2 key derivation—your files never leave your device.
+          Upload a file, enter a passphrase, choose an encryption algorithm, and download the encrypted file. All encryption happens locally in your browser.
         </p>
       </div>
 
@@ -67,12 +59,28 @@ export default function EncryptPage() {
           type="password"
           placeholder="Enter a strong passphrase"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
         />
         <PasswordStrength password={password} />
       </div>
 
-      <button className="btn w-fit" disabled={!file || !password || busy} onClick={handleEncrypt}>
+      <div className="grid gap-1">
+        <label className="text-sm font-medium">Algorithm</label>
+        <select
+          className="input w-fit"
+          value={algorithm}
+          onChange={e => setAlgorithm(e.target.value as Algorithm)}
+        >
+          <option value="AES-GCM">AES-GCM (Recommended)</option>
+          <option value="AES-CBC">AES-CBC</option>
+        </select>
+      </div>
+
+      <button
+        className="btn w-fit"
+        disabled={!file || !password || busy}
+        onClick={handleEncrypt}
+      >
         {busy ? "Encrypting..." : "Encrypt & Download"}
       </button>
 
@@ -83,7 +91,7 @@ export default function EncryptPage() {
       )}
 
       <p className="text-xs text-gray-500">
-        Tip: We never upload your files. All encryption occurs locally in your browser using the Web Crypto API.
+        Tip: All encryption occurs locally in your browser. AES-GCM is recommended for most use cases.
       </p>
     </div>
   );
