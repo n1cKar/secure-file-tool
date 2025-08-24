@@ -20,15 +20,20 @@ export default function DecryptPage() {
     try {
       const { blob, suggestedName } = await decryptFile(file, password);
       downloadBlob(blob, suggestedName);
-    } catch (e: any) {
-      const msg = e?.message || "Decryption failed";
+    } catch (error: unknown) {
+      let msg = "Decryption failed";
+      if (error instanceof Error) msg = error.message;
+
+      // Friendly error message for common cases
       const friendly = /operation failed|decrypt/i.test(msg)
         ? "Wrong password or file is corrupted."
         : msg;
+
       setError(friendly);
     } finally {
       setBusy(false);
     }
+
   }
 
   return (
@@ -44,8 +49,8 @@ export default function DecryptPage() {
 
         {/* Page Description */}
         <p className="mt-3 text-gray-600 dark:text-gray-400 text-sm max-w-xl">
-          Use this page to securely decrypt files that were previously encrypted with Secure File Tool. 
-          Simply upload your encrypted <code>.enc</code> file, enter the same passphrase used during encryption, 
+          Use this page to securely decrypt files that were previously encrypted with Secure File Tool.
+          Simply upload your encrypted <code>.enc</code> file, enter the same passphrase used during encryption,
           and download the original file. All processing happens in your browser, and no file data is sent to a server.
         </p>
       </div>
@@ -54,7 +59,7 @@ export default function DecryptPage() {
       <FileDrop onFile={setFile} accept=".enc" />
       {file && (
         <div className="rounded-xl border border-gray-200 p-4 text-sm dark:border-gray-800">
-          <p><span className="font-medium">Selected:</span> {file.name} ({Math.ceil(file.size/1024)} KB)</p>
+          <p><span className="font-medium">Selected:</span> {file.name} ({Math.ceil(file.size / 1024)} KB)</p>
         </div>
       )}
 

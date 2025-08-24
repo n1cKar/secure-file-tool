@@ -20,8 +20,11 @@ export default function EncryptPage() {
     try {
       const { blob, suggestedName } = await encryptFile(file, password);
       downloadBlob(blob, suggestedName);
-    } catch (e: any) {
-      setError(e?.message || "Encryption failed");
+    } catch (error: unknown) {
+      // Safe type narrowing
+      let msg = "Encryption failed";
+      if (error instanceof Error) msg = error.message;
+      setError(msg);
     } finally {
       setBusy(false);
     }
@@ -41,7 +44,7 @@ export default function EncryptPage() {
         {/* Page Description */}
         <p className="mt-3 text-gray-600 dark:text-gray-400 text-sm max-w-xl">
           Use this page to securely encrypt your files before sharing or storing them. 
-          Upload any file type, enter a strong passphrase, and download the encrypted 
+          Upload any file type, enter a strong passphrase, and download the encrypted{" "}
           <code>.enc</code> file. All encryption happens in your browser using AES-GCM 
           with PBKDF2 key derivation—your files never leave your device.
         </p>
@@ -51,7 +54,9 @@ export default function EncryptPage() {
       <FileDrop onFile={setFile} accept="*/*" />
       {file && (
         <div className="rounded-xl border border-gray-200 p-4 text-sm dark:border-gray-800">
-          <p><span className="font-medium">Selected:</span> {file.name} ({Math.ceil(file.size / 1024)} KB)</p>
+          <p>
+            <span className="font-medium">Selected:</span> {file.name} ({Math.ceil(file.size / 1024)} KB)
+          </p>
         </div>
       )}
 
