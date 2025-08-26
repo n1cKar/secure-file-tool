@@ -18,9 +18,9 @@ Choose between AES-GCM (authenticated encryption) and AES-CBC.
 
 ## Images
 
-[1](./app_pics/1.png)
-[2](./app_pics/2.png)
-[3](./app_pics/3.png)
+![1](./app_pics/1.png)
+![2](./app_pics/2.png)
+![3](./app_pics/3.png)
 
 ## Demo Link
 

@@ -20,12 +20,13 @@ export default function Home() {
       <section className="card">
         <h2 className="mb-3 text-xl font-semibold">🛠 How It Works</h2>
         <ol className="list-decimal space-y-2 pl-5 text-sm text-gray-700 dark:text-gray-300">
-          <li>Choose a file and enter a strong passphrase.</li>
-          <li>The passphrase is transformed into an encryption key using PBKDF2 (SHA-256) with a random salt and IV.</li>
-          <li>The encrypted file stores a magic header, salt, IV, and original file metadata (name & type).</li>
-          <li>To decrypt, upload the encrypted file and enter the same passphrase. If correct, the original file is restored.</li>
+          <li>Select a file and enter a passphrase.</li>
+          <li>The passphrase is converted into a secure key using PBKDF2 (SHA-256) with a random salt and IV.</li>
+          <li>The encrypted file includes a header, salt, IV, and original file details (name & type).</li>
+          <li>To decrypt, upload the file and use the same passphrase. If correct, your original file is restored.</li>
         </ol>
       </section>
+
 
       {/* Security Tips */}
       <section className="card">
